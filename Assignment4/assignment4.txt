@@ -1,0 +1,45 @@
+su -
+cd ..
+ls
+cd var/
+ls
+cd www/
+ls
+cd html/
+service apache2 start
+service mysql start
+mysql -u root -p
+ 
+CREATE DATABASE video_output_database; # Create the database USE video_output_database; # We want to modify this database # GRANT ALL ON video_output_database.* TO 'abdurrahman'@'localhost' IDENTIFIED BY 'mypa$$w0rd';
+ 
+CREATE TABLE video_data (
+# We need "a database containing the video output of 100 cameras"
+# Therefore, the video_content and id must not be null. All other fields are optional.
+id VARCHAR(16) NOT NULL,
+# If the id contains only numbers, we use something like INT (depending on the ID size)
+# If the value contains letters, we must use VARCHAR. Some serial numbers may have letters.
+# A typical camera ID does not usually exceed 16 characters and ID’s may vary in length depending on the manufacturer, so we use VARCHAR
+# The ID should not be null. Otherwise, we cannot identify the camera
+timestamp DATETIME,
+              # The oldest camera footage recorded was 1888
+              # The company may wish to reuse or modify this table after 2035
+              # Therefore, DATETIME should be used instead of TIMESTAMP due to TIMESTAMP's limited range
+              # Timestamp should be optional as some videos may not have a timestamp
+video_content TINYTEXT NOT NULL,
+# Paths are generally smaller than 255 characters at max
+# We may “never search more than a certain number of leading characters in a field” in a file path
+# We may only need the text after the last ‘/’ when searching
+# Therefore, TINYTEXT should be used instead of VARCHAR
+# Every entry must have a camera (ID) and a video (PATH), so it cannot be null
+thumbnail TINYTEXT,
+# For thumbnail, the same logic as video_content applies
+# thumbnail and hash can be optional fields as they can be calculated later
+hash BINARY(32) NOT NULL)
+ENGINE InnoDB;
+ 
+CREATE TABLE image_data (
+hash BINARY(32) ,
+# The hash can be calculated later, so it can be initially null image_content TINYTEXT NOT NULL,
+# The content should not be null as it would defeat the purpose of this table
+# timestamp can be optional as some pictures may not have a timestamp timestamp DATETIME) 
+ENGINE InnoDB;
